@@ -12,19 +12,19 @@ request("https://www.theguardian.com/international", (error, response, html) => 
             const headline = $(el)
                 .find('.fc-item__header')
                 .text()
-            console.log(headline)
+            console.log("Headline" + headline)
             // Summary
             const summary = $(el)
                 .find('.fc-item__standfirst-wrapper')
                 .text();
-            console.log(summary);
+            console.log("Summary" + summary);
 
             // URL
             const url = $(el)
                 .find('.fc-item__title')
                 .find('a')
                 .attr('href');
-            console.log(url)
+            console.log("URL" + url)
 
         });
     }
@@ -33,8 +33,14 @@ request("https://www.theguardian.com/international", (error, response, html) => 
 
 // STEP 2: 
 
-// a) I should be able to leave a comment on the article 
+// a) I should be able to leave a comment on the article
+    // TODO:: need to create a form to enter in comments
+    // TODO:: need to have a button to post the comment 
+    // TODO:: need to have a click function to trigger the posting of the comment 
+    // TODO:: need to have the comment posted back onto the page
+
 // b) I should be able to revisit my comments later
+    // TODO:: need to create a db for the articles saved
 // c) When I revisit my comments, they should be saved in the database alongside the article they were saved for
 // d) I should be able to delete my comments
 // e) I should have my comments visible to everyone
