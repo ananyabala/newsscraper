@@ -1,0 +1,7 @@
+{
+    "name": "Mongo News Scraper",
+    "description": "Scraping news from the Guardian",
+    "repository": "https://github.com/ananyabala/newsscraper.git",
+    "keywords": ["node","express","static"],
+    "image":"heroku/nodejs"
+}

@@ -1,47 +1,50 @@
+// var scrapeFunction = require("./data/scrape")
+
 // STEP 1: Get the scraping to work and scrape 1) the headline, 2) summary and 3) url
 
-const request = require('request');
-const cheerio = require('cheerio');
+var express = require("express");
+var bodyParser = require("body-parser");
+var mongoose = require("mongoose");
 
-request("https://www.theguardian.com/international", (error, response, html) => {
-    if (!error && response.statusCode == 200) {
-        const $ = cheerio.load(html);
+// Our scraping tools
+// Axios is a promised-based http library, similar to jQuery's Ajax method
+// It works on the client and on the server
+var axios = require("axios");
+var cheerio = require("cheerio");
+var request = require("request");
+// Require all models
+var db = require("./models");
 
-        $('.fc-item__container').each((i, el) => {
-            // Headline
-            const headline = $(el)
-                .find('.fc-item__header')
-                .text()
-            console.log("Headline" + headline)
-            // Summary
-            const summary = $(el)
-                .find('.fc-item__standfirst-wrapper')
-                .text();
-            console.log("Summary" + summary);
+var PORT = 3000;
 
-            // URL
-            const url = $(el)
-                .find('.fc-item__title')
-                .find('a')
-                .attr('href');
-            console.log("URL" + url)
+// Initialize Express
+var app = express();
 
-        });
-    }
+// Configure middleware
 
-});
+// Use morgan logger for logging requests
+//app.use(logger("dev"));
+// Use body-parser for handling form submissions
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+// Use express.static to serve the public folder as a static directory
+app.use(express.static("views"));
 
-// STEP 2: 
+require("./routes/apiRoutes")(app);
+require("./routes/htmlRoutes")(app);
 
-// a) I should be able to leave a comment on the article
-    // TODO:: need to create a form to enter in comments
-    // TODO:: need to have a button to post the comment 
-    // TODO:: need to have a click function to trigger the posting of the comment 
-    // TODO:: need to have the comment posted back onto the page
+//Database Server
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsScraper";
 
-// b) I should be able to revisit my comments later
-    // TODO:: need to create a db for the articles saved
-// c) When I revisit my comments, they should be saved in the database alongside the article they were saved for
-// d) I should be able to delete my comments
-// e) I should have my comments visible to everyone
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI, console.log("connected"));
+
+// Server the application is running on
+var port = process.env.PORT||PORT;
+app.listen(port);
+console.log('Server started! At http://localhost:'+port);
+
+
 
