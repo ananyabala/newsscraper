@@ -1,9 +1,12 @@
 var axios = require('axios')
 var cheerio = require('cheerio')
+var db = require("../models")
+
 var scrapeFunction = function () {
 
     return axios.get("https://www.theguardian.com/international").then(function (res) {
         var $ = cheerio.load(res.data); //res.data = guardian website data
+    
         // console.log(res.data); //console.logging cheerio data
         var articles = []
 
@@ -29,23 +32,28 @@ var scrapeFunction = function () {
             articles.push(articlesToPush)
             // console.log(articles)
 
-
-            db.Article.create(res)
-                .then(function (dbArticle) {
-                    // View the added result in the console
-                    console.log(dbArticle);
-                })
-                .catch(function (err) {
-                    // If an error occurred, send it to the client
-                    return res.json(err);
-                });
         })
-        // return articles;
+
+        db.Article.create(res)
+            .then(function (dbArticle) {
+                // View the added result in the console
+                console.log('this is a test');
+                console.log(dbArticle);
+            })
+            .catch(function (err) {
+                // If an error occurred, send it to the client
+                return err;
+            });
+
+        return articles;
 
         // If we were able to successfully scrape and save an Article, send a message to the client
         res.send("Scrape Complete");
-    })
+
+    });
 }
+
+
 scrapeFunction();
 module.exports = scrapeFunction
 
