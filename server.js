@@ -159,44 +159,47 @@ mongoose.connect("mongodb://localhost/try2");
 //         });
 //     });
 
-axios.get("https://www.theguardian.com/international").then(function (response, req, res) {
-    var $ = cheerio.load(response.data);
-    // console.log($);
+app.get("/", function (req, res) {
 
-    $('.fc-item__container').each(function (el, i, res) {
+    res.send("Scrape Complete"); 
 
-        var news = {}; //this is where we will be pushing all of our scraped results 
-        // Headline
-        news.headline = $(this).find('.fc-item__header').text().trim()
-        news.summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
-        news.url = $(this).find('.fc-item__title').find('a').attr('href').trim()
-        // Summary
-        // var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
-        // // console.log(summary);
-        // // URL
-        // var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
-        // // console.log(url);
+    axios.get("https://www.theguardian.com/international").then(function (response, req) {
+        var $ = cheerio.load(response.data);
+        // console.log($);
 
-        // // Initialize an object and storing all the data in an object
-        // var articlesToPush = {
-        //     headline: headline,
-        //     summary: summary,
-        //     url: url
-        // // };
-        // // pushing the various objects to the articles object
-        // articles.push(articlesToPush)
-        console.log(news)
+        $('.fc-item__container').each(function (el, i, res) {
 
-        db.Article.create(news).then(function (dbArticle) {
-            console.log(dbArticle);
-        }).catch(function (err) {
-            throw err;
+            var news = {}; //this is where we will be pushing all of our scraped results 
+            // Headline
+            news.headline = $(this).find('.fc-item__header').text().trim()
+            news.summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+            news.url = $(this).find('.fc-item__title').find('a').attr('href').trim()
+            // Summary
+            // var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+            // // console.log(summary);
+            // // URL
+            // var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
+            // // console.log(url);
+
+            // // Initialize an object and storing all the data in an object
+            // var articlesToPush = {
+            //     headline: headline,
+            //     summary: summary,
+            //     url: url
+            // // };
+            // // pushing the various objects to the articles object
+            // articles.push(articlesToPush)
+            // console.log(news)
+
+            db.Article.create(news).then(function (dbArticle) {
+                console.log(dbArticle);
+            }).catch(function (err) {
+                throw err;
+            });
         });
+        // If we were able to successfully scrape and save an Article, send a message to the client
     });
-    // If we were able to successfully scrape and save an Article, send a message to the client
-    res.send("Scrape Complete");
 });
-//});
 
 // Route for getting all Articles from the db
 app.get("/articles", function (req, res) {
