@@ -161,33 +161,33 @@ mongoose.connect("mongodb://localhost/try2");
 
 axios.get("https://www.theguardian.com/international").then(function (response, req, res) {
     var $ = cheerio.load(response.data);
-    console.log($);
+    // console.log($);
 
-    var articles = []; //this is where we will be pushing all of our scraped results 
+    $('.fc-item__container').each(function (el, i, res) {
 
-    $('.fc-item__container').each(function (el, i) {
-
+        var news = {}; //this is where we will be pushing all of our scraped results 
         // Headline
-        var headline = $(this).find('.fc-item__header').text().trim()
-        // console.log(headline);
+        news.headline = $(this).find('.fc-item__header').text().trim()
+        news.summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+        news.url = $(this).find('.fc-item__title').find('a').attr('href').trim()
         // Summary
-        var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
-        // console.log(summary);
-        // URL
-        var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
-        // console.log(url);
+        // var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+        // // console.log(summary);
+        // // URL
+        // var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
+        // // console.log(url);
 
-        // Initialize an object and storing all the data in an object
-        var articlesToPush = {
-            headline: headline,
-            summary: summary,
-            url: url
-        };
-        // pushing the various objects to the articles object
-        articles.push(articlesToPush)
-        console.log(articles)
+        // // Initialize an object and storing all the data in an object
+        // var articlesToPush = {
+        //     headline: headline,
+        //     summary: summary,
+        //     url: url
+        // // };
+        // // pushing the various objects to the articles object
+        // articles.push(articlesToPush)
+        console.log(news)
 
-        db.Article.create(articles).then(function (dbArticle) {
+        db.Article.create(news).then(function (dbArticle) {
             console.log(dbArticle);
         }).catch(function (err) {
             throw err;
