@@ -1,9 +1,102 @@
-// var scrapeFunction = require("./data/scrape")
+// // var scrapeFunction = require("./data/scrape")
 
-// STEP 1: Get the scraping to work and scrape 1) the headline, 2) summary and 3) url
+// // STEP 1: Get the scraping to work and scrape 1) the headline, 2) summary and 3) url
+
+// var express = require("express");
+// var bodyParser = require("body-parser");
+// var mongoose = require("mongoose");
+// var logger = require("morgan");
+// var axios = require("axios");
+// var cheerio = require("cheerio");
+// // var request = require("request");
+
+// // Require all models
+// var db = require("./models");
+
+// // Express Server
+// var PORT = process.env.PORT || 8080;
+// //Database Server
+// var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newswebsite";
+
+// // Initialize Express
+// var app = express();
+
+// // Configure middleware
+
+// // Use morgan logger for logging requests
+// app.use(logger("dev"));
+// // Use body-parser for handling form submissions
+// app.use(bodyParser.urlencoded({ extended: true }));
+// // app.use(bodyParser.json());
+// // Use express.static to serve the public folder as a static directory
+// app.use(express.static("views"));
+
+
+
+// // Connect to the Mongo DB
+// mongoose.Promise = Promise;
+// mongoose.connect(MONGODB_URI, console.log("connected"));
+// // require("./routes/apiRoutes")(app);
+// // require("./routes/htmlRoutes")(app);
+
+// // Routes 
+
+//     axios.get("https://www.theguardian.com/international").then(function (response,req, res) {
+//         var $ = cheerio.load(response.data);
+//         console.log($);
+
+//         var articles = []; //this is where we will be pushing all of our scraped results 
+
+//         $('.fc-item__container').each(function (el, i) {
+
+//             // Headline
+//             var headline = $(this).find('.fc-item__header').text().trim()
+//             // console.log(headline);
+//             // Summary
+//             var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+//             // console.log(summary);
+//             // URL
+//             var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
+//             // console.log(url);
+
+//             // Initialize an object and storing all the data in an object
+//             var articlesToPush = {
+//                 headline: headline,
+//                 summary: summary,
+//                 url: url
+//             };
+//             // pushing the various objects to the articles object
+//             articles.push(articlesToPush)
+//             console.log(articles)
+
+//             db.Article.create(articles).then(function (dbArticle) {
+//                 console.log(dbArticle);
+//             }).catch(function (err) {
+//                 throw err;
+//             });
+//         });
+
+//         // Testing if scrape has successfully worked
+//         // res.send("Scrape Complete");
+//         console.log("Scrape Complete"); 
+// });
+
+// app.get("/news",function(req,res){
+//     db.Article.find([]).then(function(dbArticle){
+//         res.json(dbArticle);
+//     }).catch(function(err){
+//         res.json(err);
+//     });
+// });
+
+// // Start the server
+// app.listen(PORT, function () {
+//     console.log("App running on port http://localhost:" + PORT + "!");
+// });
 
 var express = require("express");
 var bodyParser = require("body-parser");
+var logger = require("morgan");
 var mongoose = require("mongoose");
 
 // Our scraping tools
@@ -11,7 +104,7 @@ var mongoose = require("mongoose");
 // It works on the client and on the server
 var axios = require("axios");
 var cheerio = require("cheerio");
-var request = require("request");
+
 // Require all models
 var db = require("./models");
 
@@ -23,28 +116,139 @@ var app = express();
 // Configure middleware
 
 // Use morgan logger for logging requests
-//app.use(logger("dev"));
+app.use(logger("dev"));
 // Use body-parser for handling form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 // Use express.static to serve the public folder as a static directory
-app.use(express.static("views"));
+app.use(express.static("public"));
 
-require("./routes/apiRoutes")(app);
-require("./routes/htmlRoutes")(app);
-
-//Database Server
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsScraper";
-
-// Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
-mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI, console.log("connected"));
+mongoose.connect("mongodb://localhost/try2");
 
-// Server the application is running on
-var port = process.env.PORT||PORT;
-app.listen(port);
-console.log('Server started! At http://localhost:'+port);
+// Routes
 
+// A GET route for scraping the echoJS website
+// //app.get("/scrape", function(req, res) {
+//   // First, we grab the body of the html with request
+//   axios.get("http://www.echojs.com/").then(function(response) {
+//     // Then, we load that into cheerio and save it to $ for a shorthand selector
+//     var $ = cheerio.load(response.data);
 
+//     // Now, we grab every h2 within an article tag, and do the following:
+//     $("article h2").each(function(i, element) {
+//       // Save an empty result object
+//       var result = {};
 
+//       // Add the text and href of every link, and save them as properties of the result object
+//       result.title = $(this)
+//         .children("a")
+//         .text();
+//       result.link = $(this)
+//         .children("a")
+//         .attr("href");
+
+//       // Create a new Article using the `result` object built from scraping
+//       db.Article.create(result)
+//         .then(function(dbArticle) {
+//           // View the added result in the console
+//           console.log(dbArticle);
+//         })
+//         .catch(function(err) {
+//           // If an error occurred, send it to the client
+//           return res.json(err);
+//         });
+//     });
+
+axios.get("https://www.theguardian.com/international").then(function (response, req, res) {
+    var $ = cheerio.load(response.data);
+    console.log($);
+
+    var articles = []; //this is where we will be pushing all of our scraped results 
+
+    $('.fc-item__container').each(function (el, i) {
+
+        // Headline
+        var headline = $(this).find('.fc-item__header').text().trim()
+        // console.log(headline);
+        // Summary
+        var summary = $(this).find('.fc-item__standfirst-wrapper').text().trim()
+        // console.log(summary);
+        // URL
+        var url = $(this).find('.fc-item__title').find('a').attr('href').trim()
+        // console.log(url);
+
+        // Initialize an object and storing all the data in an object
+        var articlesToPush = {
+            headline: headline,
+            summary: summary,
+            url: url
+        };
+        // pushing the various objects to the articles object
+        articles.push(articlesToPush)
+        console.log(articles)
+
+        db.Article.create(articles).then(function (dbArticle) {
+            console.log(dbArticle);
+        }).catch(function (err) {
+            throw err;
+        });
+    });
+    // If we were able to successfully scrape and save an Article, send a message to the client
+    res.send("Scrape Complete");
+});
+//});
+
+// Route for getting all Articles from the db
+app.get("/articles", function (req, res) {
+    // Grab every document in the Articles collection
+    db.Article.find({})
+        .then(function (dbArticle) {
+            // If we were able to successfully find Articles, send them back to the client
+            res.json(dbArticle);
+        })
+        .catch(function (err) {
+            // If an error occurred, send it to the client
+            res.json(err);
+        });
+});
+
+// Route for grabbing a specific Article by id, populate it with it's note
+app.get("/articles/:id", function (req, res) {
+    // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
+    db.Article.findOne({ _id: req.params.id })
+        // ..and populate all of the notes associated with it
+        .populate("comment")
+        .then(function (dbArticle) {
+            // If we were able to successfully find an Article with the given id, send it back to the client
+            res.json(dbArticle);
+        })
+        .catch(function (err) {
+            // If an error occurred, send it to the client
+            res.json(err);
+        });
+});
+
+// Route for saving/updating an Article's associated Note
+app.post("/articles/:id", function (req, res) {
+    // Create a new note and pass the req.body to the entry
+    db.Note.create(req.body)
+        .then(function (dbNote) {
+            // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
+            // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+            // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+        })
+        .then(function (dbArticle) {
+            // If we were able to successfully update an Article, send it back to the client
+            res.json(dbArticle);
+        })
+        .catch(function (err) {
+            // If an error occurred, send it to the client
+            res.json(err);
+        });
+});
+
+// Start the server
+app.listen(PORT, function () {
+    console.log("App running on port " + PORT + "!");
+});
